@@ -1179,7 +1179,7 @@ const PAGE_META = {
 // Credentials — edit atau tambah user di sini
 // PERHATIAN: Untuk production, validasi harus di backend
 const VALID_USERS = [
-  { email:"fakhri@sunenergy.co.id", password:"SunEnergy2026!" },
+  { email:"demo", password:"demo" },
   { email:"admin@sungroup.co.id",   password:"Admin@2026"     },
   { email:"demo@sungroup.co.id",    password:"demo123"        },
 ];
