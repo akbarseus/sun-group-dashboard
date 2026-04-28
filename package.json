@@ -1,7 +1,6 @@
 {
   "name": "sun-group-dashboard",
   "version": "1.0.0",
-  "description": "SUN Group Integrated Clean Energy Dashboard",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
