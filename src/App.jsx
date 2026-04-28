@@ -1,4 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// ─── Responsive Hook ──────────────────────────────────────────────────────────
+const useBreakpoint = () => {
+  const [w, setW] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+  useEffect(() => {
+    const fn = () => setW(window.innerWidth);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return { isMobile: w < 640, isTablet: w < 1024, w };
+};
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Cell
@@ -9,8 +20,8 @@ import {
   LogOut, Shield, ChevronRight
 } from "lucide-react";
 
-const G = "#00ab4e";
-const NAVY = "#143341";
+const G = "#00A651";
+const NAVY = "#0D1B2A";
 const DARK = "#162435";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
@@ -160,16 +171,18 @@ const EnergyFlow = () => (
 );
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
-const OverviewPage = ({ setPage }) => (
+const OverviewPage = ({ setPage }) => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:12}}>
       <KPI label="Total Financial Savings" value="Rp 892.4M" unit="" sub="↑ Solar + EV + BESS combined" color={G} Icon={TrendingDown}/>
       <KPI label="CO2e Avoided" value="675.38" unit="tCO2e" sub="Scope 1 + Scope 2" color="#8B5CF6" Icon={Leaf}/>
       <KPI label="Energy Generated" value="1.37" unit="GWh" sub="Solar PV cumulative" color="#0EA5E9" Icon={Zap}/>
       <KPI label="System Health" value="98%" unit="" sub="All systems operational" color="#F59E0B" Icon={Activity}/>
     </div>
     <EnergyFlow/>
-    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isTablet?"1fr":"2fr 1fr",gap:12}}>
       <Card>
         <SectionTitle title="Savings Breakdown — Last 30 Days" sub="3 dimensions: Solar PV, EV Fleet, BESS peak shaving"/>
         <ResponsiveContainer width="100%" height={150}>
@@ -209,7 +222,7 @@ const OverviewPage = ({ setPage }) => (
     </div>
     <Card>
       <SectionTitle title="Key Insights"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":isTablet?"repeat(2,1fr)":"repeat(3,1fr)",gap:12}}>
         {[
           {type:"success",title:"Strong cost performance",desc:"EV fleet operating 72% below diesel baseline, exceeding the 70% quarterly target."},
           {type:"warning",title:"Charging optimization opportunity",desc:"Peak charging costs detected between 2–4 PM. Consider shifting sessions to off-peak hours."},
@@ -229,17 +242,20 @@ const OverviewPage = ({ setPage }) => (
       </div>
     </Card>
   </div>
-);
+  );
+};
 
-const SolarPage = () => (
+const SolarPage = () => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:12}}>
       <KPI label="Installed Capacity" value="794" unit="kWp" color={G} Icon={Sun}/>
       <KPI label="Total Energy Generated" value="1.37" unit="GWh" color={G} Icon={Zap}/>
       <KPI label="Today Production" value="2.93" unit="MWh" sub="↑ +5% vs yesterday" color={G} Icon={Activity}/>
       <KPI label="This Month" value="82.28" unit="MWh" color={G} Icon={TrendingDown}/>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isTablet?"1fr":"2fr 1fr",gap:12}}>
       <Card>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
           <SectionTitle title="Grid vs Solar — Today (kW)" sub="27 April 2026 · Huawei Inverter · Status: Normal"/>
@@ -297,11 +313,14 @@ const SolarPage = () => (
       </ResponsiveContainer>
     </Card>
   </div>
-);
+  );
+};
 
-const EVPage = () => (
+const EVPage = () => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:10}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":isTablet?"repeat(3,1fr)":"repeat(6,1fr)",gap:10}}>
       {[{l:"Baseline Cost",v:"Rp 491.2M",c:"#6B7A8D"},{l:"Actual Cost",v:"Rp 294.8M",c:"#0EA5E9"},{l:"Total Savings",v:"40.0%",c:G},{l:"Energy Used",v:"23.3 MWh",c:"#1A2332"},{l:"Fuel Avoided",v:"9,334 L",c:"#F59E0B"},{l:"Emissions Avoided",v:"25.0 tCO2e",c:"#8B5CF6"}].map(k=>(
         <Card key={k.l} style={{padding:"12px 14px"}}>
           <p style={{fontSize:10,color:"#9BA8B5",marginBottom:6}}>{k.l}</p>
@@ -309,7 +328,7 @@ const EVPage = () => (
         </Card>
       ))}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isTablet?"1fr":"2fr 1fr",gap:12}}>
       <Card>
         <SectionTitle title="Cost Comparison — Last 30 Days" sub="Fuel baseline vs electrified actuals"/>
         <ResponsiveContainer width="100%" height={200}>
@@ -345,7 +364,8 @@ const EVPage = () => (
     </div>
     <Card>
       <SectionTitle title="Top Cost Savers" sub="Vehicles with highest savings vs diesel baseline — Last 30 days"/>
-      <table style={{width:"100%",fontSize:12,borderCollapse:"collapse"}}>
+      <div style={{overflowX:"auto"}}>
+      <table style={{width:"100%",fontSize:12,borderCollapse:"collapse",minWidth:480}}>
         <thead>
           <tr style={{borderBottom:"1px solid #E5EAF0"}}>
             {["Vehicle ID","Baseline","Actual","Savings","Reduction"].map(h=>(
@@ -367,19 +387,23 @@ const EVPage = () => (
           ))}
         </tbody>
       </table>
+      </div>
     </Card>
   </div>
-);
+  );
+};
 
-const BESSPage = () => (
+const BESSPage = () => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:12}}>
       <KPI label="Total Capacity" value="500" unit="kWh" color="#8B5CF6" Icon={Battery}/>
       <KPI label="Current SoC" value="65%" unit="" sub="Discharging mode" color="#8B5CF6" Icon={Activity}/>
       <KPI label="Peak Shaving Savings" value="Rp 113.6M" unit="" sub="This month" color={G} Icon={TrendingDown}/>
       <KPI label="Cycle Count Today" value="1.2" unit="cycles" color="#F59E0B" Icon={Zap}/>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isTablet?"1fr":"2fr 1fr",gap:12}}>
       <Card>
         <SectionTitle title="State of Charge — Today" sub="Solar charges BESS (08:00–16:00) → BESS discharges for Building & EV (night)"/>
         <ResponsiveContainer width="100%" height={200}>
@@ -413,7 +437,7 @@ const BESSPage = () => (
     </div>
     <Card>
       <SectionTitle title="BESS Role in the Green Energy Loop" sub="How BESS connects Solar PV and EV Fleet into one integrated ecosystem"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)",gap:12}}>
         {[
           {title:"☀ Solar → BESS",desc:"Excess solar stored during peak sunlight hours (08:00–16:00). Enables 24-hour green energy.",val:"120 kWh today",color:G},
           {title:"🔋 BESS → Building",desc:"Discharge during peak grid tariff hours to reduce demand charges and improve energy cost efficiency.",val:"85 kWh today",color:"#8B5CF6"},
@@ -428,17 +452,20 @@ const BESSPage = () => (
       </div>
     </Card>
   </div>
-);
+  );
+};
 
-const ESGPage = () => (
+const ESGPage = () => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:12}}>
       <KPI label="Total CO2e Avoided" value="675.38" unit="tCO2e" sub="Scope 1 + Scope 2" color={G} Icon={Leaf}/>
       <KPI label="Renewable Energy %" value="0.71%" unit="" sub="of total building load" color="#0EA5E9" Icon={Sun}/>
       <KPI label="Fuel Displaced" value="9,334" unit="liters" sub="diesel equivalent" color="#F59E0B" Icon={Zap}/>
       <KPI label="Local Workforce" value="42" unit="people" sub="installation + O&M" color="#8B5CF6" Icon={Users}/>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isTablet?"1fr":"2fr 1fr",gap:12}}>
       <Card>
         <SectionTitle title="CO2e Avoided & Fuel Displaced — Monthly Trend" sub="Oct 2025 – Apr 2026"/>
         <div style={{display:"flex",gap:16,marginBottom:10,fontSize:11,color:"#9BA8B5"}}>
@@ -468,7 +495,7 @@ const ESGPage = () => (
     </div>
     <Card>
       <SectionTitle title="ESG Summary — Q1 2026" sub="Environmental · Social · Governance"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)",gap:12}}>
         {[
           {cat:"Environmental",color:G,items:[{l:"Scope 1 Avoided (EV)",v:"25.0 tCO2e"},{l:"Scope 2 Avoided (Solar)",v:"650.38 tCO2e"},{l:"Fuel Displaced",v:"9,334 L"},{l:"Trees Equivalent",v:"889 trees"}]},
           {cat:"Social",color:"#0EA5E9",items:[{l:"Installation Workers",v:"39 people"},{l:"O&M Workers",v:"3 people"},{l:"Local Employment",v:"87%"},{l:"Training Hours",v:"240 hrs"}]},
@@ -487,18 +514,22 @@ const ESGPage = () => (
       </div>
     </Card>
   </div>
-);
+  );
+};
 
-const BillingPage = () => (
+const BillingPage = () => {
+  const { isMobile, isTablet } = useBreakpoint();
+  return (
   <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":isTablet?"repeat(2,1fr)":"repeat(3,1fr)",gap:12}}>
       <KPI label="Current Outstanding Bill" value="Rp 294.8M" unit="" sub="EV Fleet + Solar PV — Apr 2026" color="#0EA5E9" Icon={CreditCard}/>
       <KPI label="Cumulative Savings vs Baseline" value="Rp 1.18B" unit="" sub="Total 6-month savings" color={G} Icon={TrendingDown}/>
       <KPI label="Next Due Date" value="15 May" unit="2026" sub="Payment period" color="#F59E0B" Icon={Clock}/>
     </div>
     <Card>
       <SectionTitle title="Last 6 Months Payment History" sub="Solar PV + EV Fleet + BESS combined invoices"/>
-      <table style={{width:"100%",fontSize:12,borderCollapse:"collapse"}}>
+      <div style={{overflowX:"auto"}}>
+      <table style={{width:"100%",fontSize:12,borderCollapse:"collapse",minWidth:500}}>
         <thead>
           <tr style={{borderBottom:"1px solid #E5EAF0"}}>
             {["Period","Services","Invoice Amount","Status","Savings vs Fossil"].map(h=>(
@@ -518,6 +549,7 @@ const BillingPage = () => (
           ))}
         </tbody>
       </table>
+      </div>
     </Card>
     <Card style={{background:"#F0FDF4",border:"1px solid #86EFAC"}}>
       <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -529,7 +561,8 @@ const BillingPage = () => (
       </div>
     </Card>
   </div>
-);
+  );
+};
 
 // ─── Nav Config ───────────────────────────────────────────────────────────────
 const NAV = [
@@ -571,10 +604,13 @@ const LoginPage = ({ onLogin }) => {
     {label:"Solar Capacity",val:"794 kWp",color:"#F59E0B",icon:"☀"},
   ];
 
+  const { isMobile } = useBreakpoint();
+
   return (
     <div style={{display:"flex",height:"100vh",fontFamily:"'DM Sans','Segoe UI',system-ui,sans-serif",fontSize:13}}>
 
       {/* ── Left Panel ── */}
+      {!isMobile && (
       <div style={{flex:1,background:NAVY,display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"40px 48px",position:"relative",overflow:"hidden"}}>
 
         {/* Decorative rings */}
@@ -584,8 +620,7 @@ const LoginPage = ({ onLogin }) => {
 
         {/* Logo */}
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:36,height:36,borderRadius:"50%",background:G,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <Sun size={18} color="#fff"/>
+          <div style={{width:36,height:36,flexShrink:0}}><img src="/Logo_sun-01.svg" style={{width:36,height:36}}/>
           </div>
           <div>
             <p style={{color:"#fff",fontSize:15,fontWeight:700,lineHeight:1}}>SUN GROUP</p>
@@ -640,10 +675,22 @@ const LoginPage = ({ onLogin }) => {
           <p style={{color:"#4A7A9B",fontSize:11}}>Secured · ISO 27001 · Data diproses secara lokal</p>
         </div>
       </div>
+      )}
 
       {/* ── Right Panel ── */}
-      <div style={{width:420,background:"#F4F6F9",display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 48px"}}>
-        <div style={{width:"100%"}}>
+      <div style={{width:isMobile?"100%":420,background:"#F4F6F9",display:"flex",alignItems:"center",justifyContent:"center",padding:isMobile?"32px 20px":"40px 48px",overflowY:"auto"}}>
+        <div style={{width:"100%",maxWidth:380}}>
+
+          {/* Mobile logo (shown only when left panel is hidden) */}
+          {isMobile && (
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
+              <img src="/Logo_sun-01.svg" style={{width:32,height:32}}/>
+              <div>
+                <p style={{fontSize:14,fontWeight:700,color:"#1A2332",lineHeight:1}}>SUN GROUP</p>
+                <p style={{fontSize:10,color:"#9BA8B5",marginTop:2}}>Data Platform</p>
+              </div>
+            </div>
+          )}
 
           {/* Header */}
           <div style={{marginBottom:32}}>
@@ -766,16 +813,65 @@ const LoginPage = ({ onLogin }) => {
 // ─── Dashboard Shell ──────────────────────────────────────────────────────────
 const Dashboard = ({ onLogout, userName }) => {
   const [page, setPage] = useState("overview");
+  const { isMobile, isTablet } = useBreakpoint();
   const { title, sub } = PAGE_META[page];
+
+  if (isMobile) {
+    return (
+      <div style={{display:"flex",flexDirection:"column",height:"100vh",fontFamily:"'DM Sans','Segoe UI',system-ui,sans-serif",fontSize:13,background:"#F4F6F9"}}>
+        {/* Mobile Top Bar */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:NAVY,flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <img src="/Logo_sun-01.svg" style={{width:16,height:16}}/>
+            <p style={{color:"#fff",fontSize:13,fontWeight:700}}>SUN GROUP</p>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{padding:"4px 10px",borderRadius:6,background:"#162435",color:"#6B8FA8",fontSize:10}}>PT Berau Coal</div>
+            <button onClick={onLogout} style={{background:"none",border:"none",cursor:"pointer",color:"#4A7A9B",padding:2}}>
+              <LogOut size={14}/>
+            </button>
+          </div>
+        </div>
+        {/* Mobile Page Header */}
+        <div style={{padding:"12px 16px 8px",background:"#fff",borderBottom:"1px solid #E5EAF0",flexShrink:0}}>
+          <p style={{fontSize:15,fontWeight:700,color:"#1A2332",lineHeight:1}}>{title}</p>
+          <p style={{fontSize:10,color:"#9BA8B5",marginTop:2}}>{sub}</p>
+        </div>
+        {/* Content */}
+        <div style={{flex:1,overflowY:"auto",padding:"14px 12px",paddingBottom:70}}>
+          {page==="overview"&&<OverviewPage setPage={setPage}/>}
+          {page==="solar"&&<SolarPage/>}
+          {page==="ev"&&<EVPage/>}
+          {page==="bess"&&<BESSPage/>}
+          {page==="esg"&&<ESGPage/>}
+          {page==="billing"&&<BillingPage/>}
+        </div>
+        {/* Bottom Nav */}
+        <div style={{position:"fixed",bottom:0,left:0,right:0,background:NAVY,borderTop:"1px solid #1E3048",display:"flex",justifyContent:"space-around",padding:"6px 0 8px",zIndex:100}}>
+          {NAV.map(({id,label,Icon:Ic})=>{
+            const active=page===id;
+            return (
+              <button key={id} onClick={()=>setPage(id)} style={{
+                display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"4px 8px",
+                background:"none",border:"none",cursor:"pointer",color:active?G:"#4A7A9B",flex:1,
+              }}>
+                <Ic size={16}/>
+                <span style={{fontSize:9,fontWeight:active?600:400,lineHeight:1}}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{display:"flex",height:"100vh",fontFamily:"'DM Sans','Segoe UI',system-ui,sans-serif",fontSize:13,background:"#F4F6F9",overflow:"hidden"}}>
       {/* Sidebar */}
-      <div style={{width:210,flexShrink:0,background:NAVY,display:"flex",flexDirection:"column",height:"100%"}}>
+      <div style={{width:isTablet?180:210,flexShrink:0,background:NAVY,display:"flex",flexDirection:"column",height:"100%"}}>
         <div style={{padding:"18px 18px 16px",borderBottom:"1px solid #1E3048"}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:30,height:30,borderRadius:"50%",background:G,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-              <Sun size={15} color="#fff"/>
+            <div style={{width:30,height:30,flexShrink:0}}><img src="/Logo_sun-01.svg" style={{width:30,height:30}}/>
             </div>
             <div>
               <p style={{color:"#fff",fontSize:13,fontWeight:700,lineHeight:1}}>SUN GROUP</p>
