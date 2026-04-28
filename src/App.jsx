@@ -1192,24 +1192,23 @@ const LoginPage = ({ onLogin }) => {
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState("");
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      setError("Email dan password wajib diisi.");
-      return;
-    }
-    // Validasi kredensial
-    const match = VALID_USERS.find(
-      u => u.email === email && u.password === password
-    );
-    if (!match) {
-      setError("Email atau password salah. Silakan coba lagi.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setTimeout(() => { setLoading(false); onLogin(email); }, 1200);
-  };
+const handleLogin = () => {
+  // Tetap wajib isi form, tapi isinya bebas
+  if (!email || !password) {
+    setError("Email dan password wajib diisi.");
+    return;
+  }
 
+  // DEMO MODE:
+  // Semua input diterima, tidak ada validasi credential
+  setError("");
+  setLoading(true);
+
+  setTimeout(() => {
+    setLoading(false);
+    onLogin(email);
+  }, 600);
+};
   // Stat cards di panel kiri login
   const LOGIN_STATS = [
     { label:"Total Savings",    val:"Rp 892.4M", icon:"💰" },
